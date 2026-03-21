@@ -19,7 +19,7 @@ apt update
 apt install angie -y
 
 # PHP packets:
-apt install php8.1-fpm php8.1 php8.1-mysql mysql-server-8.0 php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip -y
+apt install php8.3-fpm php8.3 php8.3-mysql mysql-server-8.0 php-curl php-gd php-intl php-mbstring php-soap php-xml php-xmlrpc php-zip -y
 
 # wordpress:
 wget https://wordpress.org/latest.tar.gz -P /tmp
@@ -30,17 +30,25 @@ mkdir /var/www/html/wordpress/wp-content/uploads
 chmod -R 755 /var/www/html/wordpress/
 chown -R www-data:www-data /var/www/html/wordpress/
 
+echo
+echo "Input a username:"
+read db_user
+echo "Input a password:"
+read -s db_passwd
+
 # mysql setup:
-echo "CREATE DATABASE wordpress_db;" | mysql
-echo "CREATE USER 'wp-user'@'localhost' IDENTIFIED BY 'passwd';" | mysql
-echo "GRANT ALL ON wordpress_db.* TO 'wp-user'@'localhost';" | mysql
+echo "CREATE DATABASE site_db;" | mysql
+echo "CREATE USER '$db_user'@'localhost' IDENTIFIED BY '$db_passwd';" | mysql
+echo "GRANT ALL ON wordpress_db.* TO '$db_user'@'localhost';" | mysql
 echo "FLUSH PRIVILEGES;" | mysql
 
 cp angie.conf /etc/angie/
 cp default.conf /etc/angie/http.d/
-
 cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
 
+systemctl enable --now mysql
+systemctl enable --now php8.3-fpm.service
 systemctl restart angie
 
 
+echo "Please 
